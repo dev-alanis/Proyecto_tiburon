@@ -3,7 +3,7 @@
         'name' => 'acuario/tiburon-feliz-api',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '11260c8e1f3e9e2e8dac497c1383ee1d63149a75',
+        'reference' => '1059520370ef3cd649b2bf5cf2357834dd6cc36d',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'acuario/tiburon-feliz-api' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '11260c8e1f3e9e2e8dac497c1383ee1d63149a75',
+            'reference' => '1059520370ef3cd649b2bf5cf2357834dd6cc36d',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
