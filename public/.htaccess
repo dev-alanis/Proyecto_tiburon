@@ -1,13 +1,13 @@
 RewriteEngine On
-
-# Base del subdirectorio donde vive el proyecto en Apache
 RewriteBase /5to_proyecto_tuburon/public/
+
+DirectoryIndex index.html index.php
 
 # No reescribir archivos ni carpetas reales
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.php [QSA,L]
 
-# Pasar el header Authorization a PHP (Apache a veces lo oculta)
+# Pasar el header Authorization a PHP
 RewriteCond %{HTTP:Authorization} ^(.*)
 RewriteRule .* - [E=HTTP_AUTHORIZATION:%1]

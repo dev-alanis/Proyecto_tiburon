@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Empleados · Acuario Tiburón Feliz</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="nav"></div>
+<main class="page">
+    <header class="page-header">
+        <div><h1>Empleados</h1><p class="subtitle">Solo ADMIN</p></div>
+        <button class="btn primary" id="btn-new">+ Nuevo</button>
+    </header>
+    <div class="card" id="filters" style="display:flex"></div>
+    <div id="app"></div>
+</main>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/crud.js"></script>
+<script>
+    if (!Auth.require()) throw new Error('no auth');
+    if (!Auth.isAdmin()) { window.location.href = 'dashboard.html'; throw new Error('no admin'); }
+    Nav.render('empleados');
+
+    Crud.render({
+        endpoint: '/empleados',
+        columns: [
+            { key: 'id_empleado',      label: 'ID' },
+            { key: 'nombre',           label: 'Nombre' },
+            { key: 'apellido_paterno', label: 'Apellido paterno' },
+            { key: 'apellido_materno', label: 'Apellido materno' },
+            { key: 'puesto',           label: 'Puesto' },
+            { key: 'telefono',         label: 'Teléfono' },
+            { key: 'correo',           label: 'Correo' },
+            { key: 'activo',           label: 'Estado', render: (r) => UI.badgeBool(r.activo) },
+        ],
+        fields: [
+            { name: 'nombre',           label: 'Nombre',           type: 'text', required: true },
+            { name: 'apellido_paterno', label: 'Apellido paterno', type: 'text', required: true },
+            { name: 'apellido_materno', label: 'Apellido materno', type: 'text' },
+            { name: 'puesto',           label: 'Puesto',           type: 'text', required: true },
+            { name: 'telefono',         label: 'Teléfono',         type: 'text' },
+            { name: 'correo',           label: 'Correo',           type: 'email' },
+            { name: 'fecha_ingreso',    label: 'Fecha de ingreso', type: 'date' },
+            { name: 'activo',           label: 'Activo',           type: 'checkbox' },
+        ],
+        filters: [
+            { name: 'activo', label: 'Estado', type: 'select', options: [
+                { value: '', label: '— Todos —' },
+                { value: 'true', label: 'Activos' },
+                { value: 'false', label: 'Inactivos' },
+            ]},
+            { name: 'q', label: 'Buscar', type: 'text' },
+        ],
+        canCreate: ['ADMIN'],
+        canEdit:   ['ADMIN'],
+    });
+</script>
+</body>
+</html>

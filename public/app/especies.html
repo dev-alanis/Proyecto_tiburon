@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Especies · Acuario Tiburón Feliz</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="nav"></div>
+<main class="page">
+    <header class="page-header">
+        <div><h1>Especies</h1><p class="subtitle">Catálogo biológico</p></div>
+        <button class="btn primary" id="btn-new">+ Nueva</button>
+    </header>
+    <div class="card" id="filters" style="display:flex"></div>
+    <div id="app"></div>
+</main>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/crud.js"></script>
+<script>
+    if (!Auth.require()) throw new Error('no auth');
+    Nav.render('especies');
+
+    Crud.render({
+        endpoint: '/especies',
+        columns: [
+            { key: 'id_especie',        label: 'ID' },
+            { key: 'nombre_comun',      label: 'Nombre común' },
+            { key: 'nombre_cientifico', label: 'Nombre científico' },
+            { key: 'tipo_agua',         label: 'Agua' },
+            { key: 'temperatura_min',   label: 'Temp',
+              render: (r) => r.temperatura_min && r.temperatura_max
+                  ? `${r.temperatura_min}–${r.temperatura_max} °C` : '—' },
+            { key: 'ph_min',            label: 'pH',
+              render: (r) => r.ph_min && r.ph_max ? `${r.ph_min}–${r.ph_max}` : '—' },
+        ],
+        fields: [
+            { name: 'nombre_comun',      label: 'Nombre común',      type: 'text', required: true, full: true },
+            { name: 'nombre_cientifico', label: 'Nombre científico', type: 'text', full: true },
+            { name: 'tipo_agua',         label: 'Tipo de agua',      type: 'text' },
+            { name: 'temperatura_min',   label: 'Temp. mín (°C)',    type: 'number', step: '0.1' },
+            { name: 'temperatura_max',   label: 'Temp. máx (°C)',    type: 'number', step: '0.1' },
+            { name: 'ph_min',            label: 'pH mín',            type: 'number', step: '0.1' },
+            { name: 'ph_max',            label: 'pH máx',            type: 'number', step: '0.1' },
+            { name: 'descripcion',       label: 'Descripción',       type: 'textarea', full: true },
+        ],
+        filters: [
+            { name: 'q', label: 'Buscar', type: 'text' },
+        ],
+        canCreate: ['ADMIN'],
+        canEdit:   ['ADMIN'],
+        canDelete: ['ADMIN'],
+    });
+</script>
+</body>
+</html>

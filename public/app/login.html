@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Iniciar sesión · Acuario Tiburón Feliz</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="login-wrap">
+    <form class="login-box" id="form">
+        <div class="logo">
+            <svg viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg" style="width:120px;height:50px;">
+                <path d="M 220 55 Q 200 40 180 42 L 70 45 L 30 15 L 45 50 L 25 85 L 65 68 Q 110 78 170 75 Q 205 70 220 55 Z" fill="currentColor"/>
+                <path d="M 90 45 L 100 10 L 130 45 Z" fill="currentColor"/>
+                <circle cx="195" cy="52" r="3" fill="#fff"/>
+            </svg>
+        </div>
+        <h1>Acuario Tiburón Feliz</h1>
+        <p class="sub">Acceso del personal</p>
+
+        <div class="field">
+            <label>Usuario</label>
+            <input name="nombre_usuario" autocomplete="username" required autofocus>
+        </div>
+        <div class="field">
+            <label>Contraseña</label>
+            <input type="password" name="password" autocomplete="current-password" required>
+        </div>
+
+        <button type="submit" class="btn primary">Entrar</button>
+    </form>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script>
+    Auth.redirectIfLogged();
+
+    const form = document.getElementById('form');
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData(form);
+        const btn = form.querySelector('button');
+        btn.disabled = true;
+        btn.textContent = 'Entrando…';
+        try {
+            await Auth.login(fd.get('nombre_usuario'), fd.get('password'));
+            window.location.href = 'dashboard.html';
+        } catch (err) {
+            UI.error(err.message || 'Credenciales inválidas');
+            btn.disabled = false;
+            btn.textContent = 'Entrar';
+        }
+    });
+</script>
+</body>
+</html>

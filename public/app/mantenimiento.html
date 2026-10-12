@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Mantenimiento · Acuario Tiburón Feliz</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="nav"></div>
+<main class="page">
+    <header class="page-header">
+        <div><h1>Mantenimiento</h1><p class="subtitle">Bitácora de limpiezas</p></div>
+        <button class="btn primary" id="btn-new">+ Registrar</button>
+    </header>
+    <div class="card" id="filters" style="display:flex"></div>
+    <div id="app"></div>
+</main>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/crud.js"></script>
+<script>
+    if (!Auth.require()) throw new Error('no auth');
+    Nav.render('mantenimiento');
+
+    Crud.render({
+        endpoint: '/mantenimientos',
+        columns: [
+            { key: 'id_mantenimiento', label: 'ID' },
+            { key: 'fecha',            label: 'Fecha', render: (r) => UI.fmtDateTime(r.fecha) },
+            { key: 'tanque_nombre',    label: 'Tanque' },
+            { key: 'tipo_nombre',      label: 'Tipo' },
+            { key: 'empleado_nombre',  label: 'Empleado' },
+            { key: 'observaciones',    label: 'Observaciones' },
+        ],
+        fields: [
+            { name: 'id_tanque',             label: 'Tanque', type: 'select',
+              optionsFrom: '/tanques', optionValue: 'id_tanque', optionLabel: 'nombre', required: true },
+            { name: 'id_tipo_mantenimiento', label: 'Tipo', type: 'select',
+              optionsFrom: '/tipos-mantenimiento', optionValue: 'id_tipo_mantenimiento', optionLabel: 'nombre', required: true },
+            { name: 'id_empleado',           label: 'Empleado', type: 'select',
+              optionsFrom: '/empleados', optionValue: 'id_empleado',
+              optionLabel: 'nombre', required: true },
+            { name: 'fecha',                 label: 'Fecha y hora', type: 'datetime-local' },
+            { name: 'observaciones',         label: 'Observaciones', type: 'textarea', full: true },
+        ],
+        filters: [
+            { name: 'id_tanque', label: 'Tanque', type: 'select',
+              optionsFrom: '/tanques', optionValue: 'id_tanque', optionLabel: 'nombre' },
+            { name: 'id_tipo_mantenimiento', label: 'Tipo', type: 'select',
+              optionsFrom: '/tipos-mantenimiento', optionValue: 'id_tipo_mantenimiento', optionLabel: 'nombre' },
+            { name: 'fecha_desde', label: 'Desde', type: 'date' },
+            { name: 'fecha_hasta', label: 'Hasta', type: 'date' },
+        ],
+        canCreate: ['ADMIN', 'CUIDADOR'],
+        canEdit:   ['ADMIN'],
+        canDelete: ['ADMIN'],
+        transformIn: (data) => {
+            if (data.fecha) data.fecha = data.fecha.replace('T', ' ') + ':00';
+            return data;
+        },
+    });
+</script>
+</body>
+</html>

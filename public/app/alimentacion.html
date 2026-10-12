@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Alimentación · Acuario Tiburón Feliz</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="nav"></div>
+<main class="page">
+    <header class="page-header">
+        <div>
+            <h1>Alimentación</h1>
+            <p class="subtitle">Cada registro descuenta stock del artículo vinculado</p>
+        </div>
+        <button class="btn primary" id="btn-new">+ Alimentar</button>
+    </header>
+    <div class="card" id="filters" style="display:flex"></div>
+    <div id="app"></div>
+</main>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/crud.js"></script>
+<script>
+    if (!Auth.require()) throw new Error('no auth');
+    Nav.render('alimentacion');
+
+    Crud.render({
+        endpoint: '/alimentacion',
+        columns: [
+            { key: 'id_alimentacion', label: 'ID' },
+            { key: 'fecha_hora',      label: 'Fecha', render: (r) => UI.fmtDateTime(r.fecha_hora) },
+            { key: 'tanque_nombre',   label: 'Tanque' },
+            { key: 'alimento_nombre', label: 'Alimento' },
+            { key: 'articulo_nombre', label: 'Artículo',
+              render: (r) => r.articulo_nombre
+                ? `${UI.escape(r.articulo_nombre)} <span class="badge info">${UI.escape(r.articulo_unidad || '')}</span>`
+                : '—' },
+            { key: 'cantidad',        label: 'Cantidad' },
+            { key: 'empleado_nombre', label: 'Empleado' },
+            { key: 'observaciones',   label: 'Obs.' },
+        ],
+        fields: [
+            { name: 'id_tanque',     label: 'Tanque', type: 'select',
+              optionsFrom: '/tanques', optionValue: 'id_tanque', optionLabel: 'nombre', required: true },
+            { name: 'id_alimento',   label: 'Tipo de alimento', type: 'select',
+              optionsFrom: '/tipos-alimento', optionValue: 'id_alimento', optionLabel: 'nombre', required: true },
+            { name: 'id_empleado',   label: 'Empleado', type: 'select',
+              optionsFrom: '/empleados', optionValue: 'id_empleado',
+              optionLabel: 'nombre', required: true },
+            { name: 'cantidad',      label: 'Cantidad', type: 'number', step: '0.01', min: '0.01', required: true },
+            { name: 'fecha_hora',    label: 'Fecha y hora', type: 'datetime-local' },
+            { name: 'observaciones', label: 'Observaciones', type: 'textarea', full: true },
+        ],
+        filters: [
+            { name: 'id_tanque',   label: 'Tanque', type: 'select',
+              optionsFrom: '/tanques', optionValue: 'id_tanque', optionLabel: 'nombre' },
+            { name: 'id_alimento', label: 'Alimento', type: 'select',
+              optionsFrom: '/tipos-alimento', optionValue: 'id_alimento', optionLabel: 'nombre' },
+            { name: 'fecha_desde', label: 'Desde', type: 'date' },
+            { name: 'fecha_hasta', label: 'Hasta', type: 'date' },
+        ],
+        canCreate: ['ADMIN', 'CUIDADOR'],
+        canEdit:   ['ADMIN'],
+        canDelete: ['ADMIN'],
+        transformIn: (data) => {
+            if (data.fecha_hora) data.fecha_hora = data.fecha_hora.replace('T', ' ') + ':00';
+            return data;
+        },
+    });
+</script>
+</body>
+</html>

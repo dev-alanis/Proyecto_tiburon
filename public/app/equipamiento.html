@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Equipamiento · Acuario Tiburón Feliz</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="nav"></div>
+<main class="page">
+    <header class="page-header">
+        <div><h1>Equipamiento</h1><p class="subtitle">Equipos por tanque</p></div>
+        <button class="btn primary" id="btn-new">+ Nuevo</button>
+    </header>
+    <div class="card" id="filters" style="display:flex"></div>
+    <div id="app"></div>
+</main>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/crud.js"></script>
+<script>
+    if (!Auth.require()) throw new Error('no auth');
+    Nav.render('equipamiento');
+
+    Crud.render({
+        endpoint: '/equipamiento',
+        columns: [
+            { key: 'id_equipamiento', label: 'ID' },
+            { key: 'nombre',          label: 'Nombre' },
+            { key: 'tipo',            label: 'Tipo' },
+            { key: 'marca',           label: 'Marca' },
+            { key: 'modelo',          label: 'Modelo' },
+            { key: 'tanque_nombre',   label: 'Tanque' },
+            { key: 'fecha_instalacion', label: 'Instalado', render: (r) => UI.fmtDate(r.fecha_instalacion) },
+            { key: 'estado',          label: 'Estado', render: (r) => `<span class="badge ${r.estado === 'Activo' ? 'activo' : 'warn'}">${UI.escape(r.estado)}</span>` },
+        ],
+        fields: [
+            { name: 'id_tanque',         label: 'Tanque', type: 'select',
+              optionsFrom: '/tanques', optionValue: 'id_tanque', optionLabel: 'nombre', required: true },
+            { name: 'nombre',            label: 'Nombre', type: 'text', required: true },
+            { name: 'tipo',              label: 'Tipo',   type: 'text' },
+            { name: 'marca',             label: 'Marca',  type: 'text' },
+            { name: 'modelo',            label: 'Modelo', type: 'text' },
+            { name: 'fecha_instalacion', label: 'Fecha de instalación', type: 'date' },
+            { name: 'estado',            label: 'Estado', type: 'select', options: [
+                { value: 'Activo',              label: 'Activo' },
+                { value: 'Mantenimiento',       label: 'Mantenimiento' },
+                { value: 'Fuera de servicio',   label: 'Fuera de servicio' },
+                { value: 'Retirado',            label: 'Retirado' },
+            ]},
+        ],
+        filters: [
+            { name: 'id_tanque', label: 'Tanque', type: 'select',
+              optionsFrom: '/tanques', optionValue: 'id_tanque', optionLabel: 'nombre' },
+            { name: 'estado',    label: 'Estado', type: 'select', options: [
+                { value: '', label: '— Todos —' },
+                { value: 'Activo', label: 'Activo' },
+                { value: 'Mantenimiento', label: 'Mantenimiento' },
+                { value: 'Retirado', label: 'Retirado' },
+            ]},
+        ],
+        canCreate: ['ADMIN'],
+        canEdit:   ['ADMIN'],
+    });
+</script>
+</body>
+</html>

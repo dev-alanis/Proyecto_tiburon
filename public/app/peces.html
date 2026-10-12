@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Peces · Acuario Tiburón Feliz</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="nav"></div>
+<main class="page">
+    <header class="page-header">
+        <div><h1>Peces</h1><p class="subtitle">Fichas individuales</p></div>
+        <button class="btn primary" id="btn-new">+ Nuevo</button>
+    </header>
+    <div class="card" id="filters" style="display:flex"></div>
+    <div id="app"></div>
+</main>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/crud.js"></script>
+<script>
+    if (!Auth.require()) throw new Error('no auth');
+    Nav.render('peces');
+
+    Crud.render({
+        endpoint: '/peces',
+        columns: [
+            { key: 'id_pez',     label: 'ID' },
+            { key: 'nombre',     label: 'Nombre' },
+            { key: 'especie',    label: 'Especie' },
+            { key: 'sexo',       label: 'Sexo' },
+            { key: 'fecha_ingreso', label: 'Ingreso', render: (r) => UI.fmtDate(r.fecha_ingreso) },
+            { key: 'estado',     label: 'Estado', render: (r) => `<span class="badge info">${UI.escape(r.estado)}</span>` },
+        ],
+        fields: [
+            { name: 'id_especie',      label: 'Especie', type: 'select',
+              optionsFrom: '/especies', optionValue: 'id_especie', optionLabel: 'nombre_comun', required: true },
+            { name: 'nombre',          label: 'Nombre' },
+            { name: 'sexo',            label: 'Sexo', type: 'select', options: [
+                { value: 'Macho',   label: 'Macho' },
+                { value: 'Hembra',  label: 'Hembra' },
+                { value: 'Desconocido', label: 'Desconocido' },
+            ]},
+            { name: 'fecha_ingreso',   label: 'Fecha de ingreso', type: 'date', required: true },
+            { name: 'fecha_nacimiento',label: 'Fecha de nacimiento', type: 'date' },
+            { name: 'estado',          label: 'Estado', type: 'select', options: [
+                { value: 'Activo',      label: 'Activo' },
+                { value: 'Enfermo',     label: 'Enfermo' },
+                { value: 'Cuarentena',  label: 'Cuarentena' },
+                { value: 'Fallecido',   label: 'Fallecido' },
+                { value: 'Transferido', label: 'Transferido' },
+            ]},
+        ],
+        filters: [
+            { name: 'id_especie', label: 'Especie', type: 'select',
+              optionsFrom: '/especies', optionValue: 'id_especie', optionLabel: 'nombre_comun' },
+            { name: 'estado',     label: 'Estado', type: 'select', options: [
+                { value: '', label: '— Todos —' },
+                { value: 'Activo', label: 'Activo' },
+                { value: 'Enfermo', label: 'Enfermo' },
+                { value: 'Cuarentena', label: 'Cuarentena' },
+            ]},
+            { name: 'q',          label: 'Buscar', type: 'text' },
+        ],
+        canCreate: ['ADMIN'],
+        canEdit:   ['ADMIN'],
+    });
+</script>
+</body>
+</html>

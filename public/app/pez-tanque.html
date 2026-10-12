@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Pez–Tanque · Acuario Tiburón Feliz</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="nav"></div>
+<main class="page">
+    <header class="page-header">
+        <div>
+            <h1>Pez–Tanque</h1>
+            <p class="subtitle">Historial de asignaciones</p>
+        </div>
+        <button class="btn primary" id="btn-new">+ Asignar</button>
+    </header>
+    <div class="card" id="filters" style="display:flex"></div>
+    <div id="app"></div>
+</main>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/crud.js"></script>
+<script>
+    if (!Auth.require()) throw new Error('no auth');
+    Nav.render('pez-tanque');
+
+    Crud.render({
+        endpoint: '/pez-tanque',
+        columns: [
+            { key: 'pez_nombre',    label: 'Pez' },
+            { key: 'especie',       label: 'Especie' },
+            { key: 'tanque_nombre', label: 'Tanque' },
+            { key: 'fecha_ingreso', label: 'Ingreso', render: (r) => UI.fmtDateTime(r.fecha_ingreso) },
+            { key: 'fecha_salida',  label: 'Salida',
+              render: (r) => r.fecha_salida
+                ? UI.fmtDateTime(r.fecha_salida)
+                : '<span class="badge activo">Activo</span>' },
+            { key: 'observaciones', label: 'Obs.' },
+        ],
+        fields: [
+            { name: 'id_pez',        label: 'Pez', type: 'select',
+              optionsFrom: '/peces', optionValue: 'id_pez',
+              optionLabel: 'nombre', required: true },
+            { name: 'id_tanque',     label: 'Tanque', type: 'select',
+              optionsFrom: '/tanques', optionValue: 'id_tanque', optionLabel: 'nombre', required: true },
+            { name: 'fecha_ingreso', label: 'Fecha y hora de ingreso', type: 'datetime-local', required: true },
+            { name: 'observaciones', label: 'Observaciones', type: 'textarea', full: true },
+        ],
+        filters: [
+            { name: 'id_pez',    label: 'Pez', type: 'select',
+              optionsFrom: '/peces', optionValue: 'id_pez', optionLabel: 'nombre' },
+            { name: 'id_tanque', label: 'Tanque', type: 'select',
+              optionsFrom: '/tanques', optionValue: 'id_tanque', optionLabel: 'nombre' },
+            { name: 'activo',    label: 'Estado', type: 'select', options: [
+                { value: '', label: '— Todos —' },
+                { value: 'true', label: 'Activos' },
+                { value: 'false', label: 'Cerrados' },
+            ]},
+        ],
+        canCreate: ['ADMIN', 'CUIDADOR'],
+        canEdit:   false,
+        canDelete: false,
+        transformIn: (data) => {
+            if (data.fecha_ingreso) data.fecha_ingreso = data.fecha_ingreso.replace('T', ' ') + ':00';
+            return data;
+        },
+    });
+</script>
+</body>
+</html>

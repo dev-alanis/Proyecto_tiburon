@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Tanques · Acuario Tiburón Feliz</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="nav"></div>
+<main class="page">
+    <header class="page-header">
+        <div><h1>Tanques</h1><p class="subtitle">Parámetros y estado</p></div>
+        <button class="btn primary" id="btn-new">+ Nuevo</button>
+    </header>
+    <div class="card" id="filters" style="display:flex"></div>
+    <div id="app"></div>
+</main>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/crud.js"></script>
+<script>
+    if (!Auth.require()) throw new Error('no auth');
+    Nav.render('tanques');
+
+    Crud.render({
+        endpoint: '/tanques',
+        columns: [
+            { key: 'id_tanque',       label: 'ID' },
+            { key: 'nombre',          label: 'Nombre' },
+            { key: 'ubicacion',       label: 'Ubicación' },
+            { key: 'tipo_agua',       label: 'Agua' },
+            { key: 'capacidad_litros',label: 'Litros', render: (r) => UI.escape(r.capacidad_litros) + ' L' },
+            { key: 'temperatura_actual', label: 'Temp', render: (r) => r.temperatura_actual ? r.temperatura_actual + ' °C' : '—' },
+            { key: 'ph_actual',       label: 'pH',      render: (r) => r.ph_actual ?? '—' },
+            { key: 'estado',          label: 'Estado',  render: (r) => `<span class="badge ${r.estado === 'Activo' ? 'activo' : 'warn'}">${UI.escape(r.estado)}</span>` },
+        ],
+        fields: [
+            { name: 'nombre',            label: 'Nombre',           type: 'text',   required: true },
+            { name: 'ubicacion',         label: 'Ubicación',        type: 'text',   required: true },
+            { name: 'tipo_agua',         label: 'Tipo de agua',     type: 'text',   required: true },
+            { name: 'capacidad_litros',  label: 'Capacidad (L)',    type: 'number', required: true, step: '0.01', min: '0.01' },
+            { name: 'temperatura_actual',label: 'Temperatura (°C)', type: 'number', step: '0.1' },
+            { name: 'ph_actual',         label: 'pH',               type: 'number', step: '0.1' },
+            { name: 'estado',            label: 'Estado',           type: 'select', options: [
+                { value: 'Activo',   label: 'Activo' },
+                { value: 'Inactivo', label: 'Inactivo' },
+                { value: 'Mantenimiento', label: 'Mantenimiento' },
+            ]},
+        ],
+        filters: [
+            { name: 'estado',    label: 'Estado',   type: 'select', options: [
+                { value: '', label: '— Todos —' },
+                { value: 'Activo', label: 'Activo' },
+                { value: 'Inactivo', label: 'Inactivo' },
+            ]},
+            { name: 'tipo_agua', label: 'Tipo de agua', type: 'text' },
+            { name: 'q',         label: 'Buscar',   type: 'text' },
+        ],
+        canCreate: ['ADMIN'],
+        canEdit:   ['ADMIN'],
+    });
+</script>
+</body>
+</html>

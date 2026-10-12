@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Inicio · Acuario Tiburón Feliz</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="nav"></div>
+<main class="page">
+    <header class="page-header">
+        <div>
+            <h1>Inicio</h1>
+            <p class="subtitle">Panel operativo del acuario</p>
+        </div>
+    </header>
+
+    <div class="card" id="welcome"></div>
+    <div class="dash-grid" id="grid"></div>
+</main>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/nav.js"></script>
+<script>
+    if (!Auth.require()) throw new Error('no auth');
+    Nav.render('dashboard');
+
+    const user = Auth.user();
+    document.getElementById('welcome').innerHTML = `
+        <h2>Hola, ${UI.escape(user.nombre_completo || user.nombre_usuario)}</h2>
+        <p class="subtitle">Rol: <strong>${UI.escape(user.rol)}</strong></p>
+    `;
+
+    const cards = [
+        { key: 'tanques',       ico: '🛢️', title: 'Tanques',       desc: 'Consulta y actualiza parámetros.' },
+        { key: 'peces',         ico: '🐟', title: 'Peces',         desc: 'Fichas de peces registrados.' },
+        { key: 'especies',      ico: '🧬', title: 'Especies',      desc: 'Catálogo de especies.' },
+        { key: 'pez-tanque',    ico: '🔀', title: 'Pez–Tanque',    desc: 'Historial de asignaciones.' },
+        { key: 'alimentacion',  ico: '🍽️', title: 'Alimentación',  desc: 'Registra y descuenta stock.' },
+        { key: 'mantenimiento', ico: '🧽', title: 'Mantenimiento', desc: 'Bitácora de limpiezas.' },
+        { key: 'equipamiento',  ico: '🔧', title: 'Equipamiento',  desc: 'Equipos por tanque.' },
+        { key: 'articulos',     ico: '📦', title: 'Artículos',     desc: 'Catálogo de artículos.' },
+        { key: 'inventario',    ico: '📊', title: 'Inventario',    desc: 'Existencias y stock bajo.' },
+    ];
+
+    if (Auth.isAdmin()) {
+        cards.push({ key: 'empleados', ico: '👥', title: 'Empleados', desc: 'Gestión del personal.' });
+        cards.push({ key: 'usuarios',  ico: '🔐', title: 'Usuarios',  desc: 'Accesos al sistema.' });
+    }
+
+    const grid = document.getElementById('grid');
+    cards.forEach((c) => {
+        const el = UI.el('div', {
+            class: 'dash-card',
+            onclick: () => window.location.href = `${c.key}.html`,
+        }, [
+            UI.el('div', { class: 'ico', text: c.ico }),
+            UI.el('h3', { text: c.title }),
+            UI.el('p', { text: c.desc }),
+        ]);
+        grid.appendChild(el);
+    });
+</script>
+</body>
+</html>

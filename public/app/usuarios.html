@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Usuarios · Acuario Tiburón Feliz</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="nav"></div>
+<main class="page">
+    <header class="page-header">
+        <div><h1>Usuarios</h1><p class="subtitle">Solo ADMIN · la contraseña se hashea</p></div>
+        <button class="btn primary" id="btn-new">+ Nuevo</button>
+    </header>
+    <div class="card" id="filters" style="display:flex"></div>
+    <div id="app"></div>
+</main>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/crud.js"></script>
+<script>
+    if (!Auth.require()) throw new Error('no auth');
+    if (!Auth.isAdmin()) { window.location.href = 'dashboard.html'; throw new Error('no admin'); }
+    Nav.render('usuarios');
+
+    Crud.render({
+        endpoint: '/usuarios',
+        columns: [
+            { key: 'id_usuario',      label: 'ID' },
+            { key: 'nombre_usuario',  label: 'Usuario' },
+            { key: 'nombre_empleado', label: 'Empleado' },
+            { key: 'rol',             label: 'Rol', render: (r) => `<span class="badge info">${UI.escape(r.rol)}</span>` },
+            { key: 'activo',          label: 'Estado', render: (r) => UI.badgeBool(r.activo) },
+            { key: 'fecha_creacion',  label: 'Creado', render: (r) => UI.fmtDate(r.fecha_creacion) },
+        ],
+        fields: [
+            { name: 'id_empleado',    label: 'Empleado', type: 'select',
+              optionsFrom: '/empleados', optionValue: 'id_empleado',
+              optionLabel: 'nombre', required: true },
+            { name: 'nombre_usuario', label: 'Nombre de usuario', type: 'text', required: true },
+            { name: 'password',       label: 'Contraseña (dejar en blanco para no cambiar)', type: 'password' },
+            { name: 'rol',            label: 'Rol', type: 'select', required: true, options: [
+                { value: 'ADMIN',   label: 'ADMIN' },
+                { value: 'CUIDADOR',label: 'CUIDADOR' },
+            ]},
+            { name: 'activo',         label: 'Activo', type: 'checkbox' },
+        ],
+        filters: [
+            { name: 'rol',    label: 'Rol', type: 'select', options: [
+                { value: '', label: '— Todos —' },
+                { value: 'ADMIN', label: 'ADMIN' },
+                { value: 'CUIDADOR', label: 'CUIDADOR' },
+            ]},
+            { name: 'activo', label: 'Estado', type: 'select', options: [
+                { value: '', label: '— Todos —' },
+                { value: 'true', label: 'Activos' },
+                { value: 'false', label: 'Inactivos' },
+            ]},
+        ],
+        canCreate: ['ADMIN'],
+        canEdit:   ['ADMIN'],
+    });
+</script>
+</body>
+</html>
